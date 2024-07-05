@@ -22,10 +22,10 @@ public class PlayAudioClipAction extends NormalAction
     {
         setName("Play Audio Clip");
         setCategory("Essentials");
-        setAuthor("rnayabed");
+        setAuthor("rnayabed & chewbacca6324");
         setServerButtonGraphic("fas-volume-up");
         setHelpLink("https://github.com/Stream-Pi/EssentialActions");
-        setVersion(new Version(2,0,1));
+        setVersion(new Version(2,0,2));
     }
 
     @Override
@@ -44,7 +44,14 @@ public class PlayAudioClipAction extends NormalAction
                 new FileExtensionFilter("HLS","*.m3u8")
         );
 
-        addClientProperties(audioFileLocationProperty);
+        Property audioFilevolumeProperty = new Property("volume", Type.DOUBLE);
+        audioFilevolumeProperty.setControlType(ControlType.SLIDER_DOUBLE);
+        audioFilevolumeProperty.setDefaultValueDouble(0.5);
+        audioFilevolumeProperty.setMinDoubleValue(0.0);
+        audioFilevolumeProperty.setMaxDoubleValue(1.0);
+        audioFilevolumeProperty.setDisplayName("Volume");
+
+        addClientProperties(audioFileLocationProperty, audioFilevolumeProperty);
     }
 
     public AudioClip mediaPlayer = null;
@@ -54,6 +61,8 @@ public class PlayAudioClipAction extends NormalAction
     public void onActionClicked() throws MinorException
     {
         Property audioFileLocationProperty = getClientProperties().getSingleProperty("audio_location");
+        double volume = getClientProperties().getSingleProperty("volume").getDoubleValue();
+
 
         if (audioFileLocationProperty.getStringValue().isBlank())
         {
@@ -77,6 +86,7 @@ public class PlayAudioClipAction extends NormalAction
             mediaPlayer = new AudioClip(new File(path).toURI().toString());
         }
 
+        mediaPlayer.setVolume(volume);
         Platform.runLater(mediaPlayer::play);
     }
 
